@@ -1,5 +1,6 @@
 # se_project_iot_49
 Software Engineering Porject of IOT group 49
-
-Group Name-list
-ltr17: 231225535 (Member)
+### member list
+| GitHub username | QMID      |
+| yugan-cxl       | 231225627 |
+| ltr17           |231225535  |
