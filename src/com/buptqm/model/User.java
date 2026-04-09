@@ -32,7 +32,7 @@ public class User {
     public void setPassword(String password) { this.password = password; }
     public String getRealName() { return realName; }
     public void setRealName(String realName) { this.realName = realName; }
-    public String getEmail() { return email; }
+    //public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
@@ -53,23 +53,32 @@ public class User {
                 (skills == null ? "" : skills);
     }
 
-    // 从CSV解析（修复越界）
+    // 从CSV解析（改进版）
     public static User fromCSVString(String csvLine) {
-        String[] fields = csvLine.split(",", -1); // 关键修复
-        User u = new User();
+        if (csvLine == null || csvLine.trim().isEmpty()) {
+            throw new IllegalArgumentException("CSV line cannot be null or empty");
+        }
+
+        String[] fields = csvLine.split(",", -1);
+
         try {
+            User u = new User();
             u.setId(fields.length > 0 && !fields[0].isEmpty() ? Integer.parseInt(fields[0]) : 0);
             u.setUsername(fields.length > 1 ? fields[1] : "");
             u.setPassword(fields.length > 2 ? fields[2] : "");
             u.setRealName(fields.length > 3 ? fields[3] : "");
             u.setEmail(fields.length > 4 ? fields[4] : "");
-            u.setRole(fields.length > 5 ? Role.valueOf(fields[5]) : Role.TA);
+            u.setRole(fields.length > 5 && !fields[5].isEmpty() ? Role.valueOf(fields[5]) : Role.TA);
             u.setWorkload(fields.length > 6 && !fields[6].isEmpty() ? Integer.parseInt(fields[6]) : 0);
             u.setSkills(fields.length > 7 ? fields[7] : "");
+            return u;
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("Failed to parse number in CSV line: " + csvLine, e);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid role value in CSV line: " + csvLine, e);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("Unexpected error parsing CSV line: " + csvLine, e);
         }
-        return u;
     }
 
     public static String getCSVHeader() {
