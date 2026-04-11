@@ -19,7 +19,7 @@ public class MOMainFrame extends JFrame {
     private final JobService jobService = new JobService();
     private final ApplicationService appService = new ApplicationService();
     private final UserService userService = new UserService();
-    private final CVService cvService = new CVService(); // 🔥 新增：CV服务
+    private final CVService cvService = new CVService(); //CV服务
 
     // 主面板组件
     private JTabbedPane tabbedPane;
@@ -246,7 +246,7 @@ public class MOMainFrame extends JFrame {
         return mainPanel;
     }
 
-    // 🔥 新增：弹出TA的CV详情窗口
+    // 弹出TA的CV详情窗口
     private void showTACV(int taId) {
         User ta = userService.getUserById(taId);
         if (ta == null) {
@@ -387,7 +387,6 @@ public class MOMainFrame extends JFrame {
         rejectBtn.setEnabled(hasApps);
     }
 
-    // 🔥 优化版：使用你已有的 updateTAWorkload 方法自动计算工作量
     private void updateApplicationStatus(String newStatus) {
         if (selectedJob == null) return;
 
@@ -404,12 +403,12 @@ public class MOMainFrame extends JFrame {
         // ===================== 核心逻辑 =====================
         // 1. 从 PENDING/REJECTED → ACCEPTED：工作量 +1
         if ("ACCEPTED".equals(newStatus) && !"ACCEPTED".equals(oldStatus)) {
-            userService.updateTAWorkload(taId, 1); // ✅ 用你现成的方法！
+            userService.updateTAWorkload(taId, 1); 
         }
 
         // 2. 从 ACCEPTED → REJECTED：工作量 -1
         if ("REJECTED".equals(newStatus) && "ACCEPTED".equals(oldStatus)) {
-            userService.updateTAWorkload(taId, -1); // ✅ 用你现成的方法！
+            userService.updateTAWorkload(taId, -1); 
         }
         // ====================================================
 
