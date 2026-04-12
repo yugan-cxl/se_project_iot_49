@@ -1,0 +1,4 @@
+id,title,description,requiredSkills,moId,status,createTime
+1,Computer Science TA,"Assist professor in grading programming assignments, lead lab sessions, and hold office hours to support students in understanding data structures and algorithms.","Python, Java, Debugging, Communication, Basic Algorithms",3,OPEN,2026-04-12T11:49:28.563
+2,Math TA (Calculus),"Help students with calculus problems, review homework solutions, and conduct weekly recitation sessions. Provide additional support during exam preparation.","Calculus I & II, Problem-solving, Patience, Tutoring experience, LaTeX",3,OPEN,2026-04-12T11:50:17.618
+3,Writing Center TA,"Work with undergraduate students to improve academic writing, provide feedback on essays and research papers, and facilitate small-group writing workshops.","Academic writing, Grammar, Peer review, Time management, Microsoft Word/Google Docs",5,OPEN,2026-04-12T11:50:35.075
