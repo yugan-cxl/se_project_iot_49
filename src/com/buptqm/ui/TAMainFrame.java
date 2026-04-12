@@ -36,8 +36,6 @@ public class TAMainFrame extends JFrame {
     private JTextArea selfIntroArea;
 
     private List<Job> allOpenJobs;
-    // CV内容分隔符（不能用逗号，避免和CSV冲突）
-    private static final String CV_SEPARATOR = "###";
 
     public TAMainFrame(User user) {
         this.user = user;
@@ -310,38 +308,32 @@ public class TAMainFrame extends JFrame {
     // 保存CV：把所有模板字段拼接成一个字符串存储
     // 保存CV：加Tel字段
     private void saveCV() {
-        String cvContent = String.join(CV_SEPARATOR,
-                nameField.getText().trim(),
-                majorField.getText().trim(),
-                emailField.getText().trim(),
-                telField.getText().trim(), // 🔥 新增：保存电话
-                educationArea.getText().trim(),
-                skillsArea.getText().trim(),
-                experienceArea.getText().trim(),
-                selfIntroArea.getText().trim()
-        );
-
         CV cv = new CV();
         cv.setTaId(user.getId());
-        cv.setContent(cvContent);
-        cv.setUploadTime(LocalDateTime.now());
-        cvService.uploadCV(cv);
+        cv.setName(nameField.getText().trim());
+        cv.setMajor(majorField.getText().trim());
+        cv.setEmail(emailField.getText().trim());
+        cv.setTel(telField.getText().trim());
+        cv.setEducationBackground(educationArea.getText().trim());
+        cv.setSkillsAbilities(skillsArea.getText().trim());
+        cv.setRelevantExperience(experienceArea.getText().trim());
+        cv.setSelfIntroduction(selfIntroArea.getText().trim());
 
+        cvService.uploadCV(cv);
         JOptionPane.showMessageDialog(this, "CV saved successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
     }
     // 加载CV：加Tel字段
     private void loadSavedCV() {
         CV savedCV = cvService.getCVByTaId(user.getId());
-        if (savedCV != null && savedCV.getContent() != null && !savedCV.getContent().isEmpty()) {
-            String[] parts = savedCV.getContent().split(CV_SEPARATOR, -1);
-            nameField.setText(parts.length > 0 ? parts[0] : "");
-            majorField.setText(parts.length > 1 ? parts[1] : "");
-            emailField.setText(parts.length > 2 ? parts[2] : "");
-            telField.setText(parts.length > 3 ? parts[3] : ""); // 🔥 新增：加载电话
-            educationArea.setText(parts.length > 4 ? parts[4] : "");
-            skillsArea.setText(parts.length > 5 ? parts[5] : "");
-            experienceArea.setText(parts.length > 6 ? parts[6] : "");
-            selfIntroArea.setText(parts.length > 7 ? parts[7] : "");
+        if (savedCV != null) {
+            nameField.setText(savedCV.getName() != null ? savedCV.getName() : "");
+            majorField.setText(savedCV.getMajor() != null ? savedCV.getMajor() : "");
+            emailField.setText(savedCV.getEmail() != null ? savedCV.getEmail() : "");
+            telField.setText(savedCV.getTel() != null ? savedCV.getTel() : "");
+            educationArea.setText(savedCV.getEducationBackground() != null ? savedCV.getEducationBackground() : "");
+            skillsArea.setText(savedCV.getSkillsAbilities() != null ? savedCV.getSkillsAbilities() : "");
+            experienceArea.setText(savedCV.getRelevantExperience() != null ? savedCV.getRelevantExperience() : "");
+            selfIntroArea.setText(savedCV.getSelfIntroduction() != null ? savedCV.getSelfIntroduction() : "");
         }
     }
 }
