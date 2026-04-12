@@ -1,0 +1,6 @@
+id,username,password,realName,email,role,workload,skills
+1,TA1,123,Jack,1@1.com,TA,0,
+2,TA2,123,Bob,2@2.com,TA,0,
+3,MO1,123,Epstein,3@3.com,MO,0,
+4,ADMIN,123,Admin,123@123.com,ADMIN,0,
+5,MO2,123,Vans,2@1.com,MO,0,
