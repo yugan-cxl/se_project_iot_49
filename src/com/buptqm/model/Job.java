@@ -1,31 +1,19 @@
 package com.buptqm.model;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Job {
     private int id;
     private String title;
     private String description;
-    private String requiredSkills; // 所需技能，逗号分隔
-    private int moId; // 发布者MO的用户ID
-    private String status; // OPEN/CLOSED
-    private LocalDateTime createTime;
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private String requiredSkills;
+    private int moId;
+    private String status;
+    private LocalDateTime createTime; // 你有这个字段
 
-    public Job() {}
-
-    public Job(int id, String title, String description, String requiredSkills, int moId, String status, LocalDateTime createTime) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.requiredSkills = requiredSkills;
-        this.moId = moId;
-        this.status = status;
-        this.createTime = createTime;
-    }
-
-    // Getter & Setter
+    // ====================== GETTER / SETTER ======================
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
     public String getTitle() { return title; }
@@ -41,31 +29,84 @@ public class Job {
     public LocalDateTime getCreateTime() { return createTime; }
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
 
+    // ====================== CSV 转义工具 ======================
+    public static String escapeCsv(String value) {
+        if (value == null) return "";
+        boolean needQuotes = value.contains(",") || value.contains("\n") || value.contains("\"");
+        if (needQuotes) {
+            value = value.replace("\"", "\"\"");
+            return "\"" + value + "\"";
+        }
+        return value;
+    }
+
+    public static String unescapeCsv(String value) {
+        if (value == null || value.isEmpty()) return "";
+        if (value.startsWith("\"") && value.endsWith("\"")) {
+            value = value.substring(1, value.length() - 1);
+            value = value.replace("\"\"", "\"");
+        }
+        return value;
+    }
+
     public String toCSVString() {
-        return String.join(",",
-                String.valueOf(id),
-                title,
-                description,
-                requiredSkills,
-                String.valueOf(moId),
-                status,
-                createTime.format(FORMATTER)
-        );
+        return id + "," +
+                escapeCsv(title) + "," +
+                escapeCsv(description) + "," +
+                escapeCsv(requiredSkills) + "," +
+                moId + "," +
+                status + "," +
+                createTime; 
     }
 
     public static Job fromCSVString(String csvLine) {
-        String[] fields = csvLine.split(",");
-        Job job = new Job();
-        job.setId(Integer.parseInt(fields[0]));
-        job.setTitle(fields[1]);
-        job.setDescription(fields[2]);
-        job.setRequiredSkills(fields[3]);
-        job.setMoId(Integer.parseInt(fields[4]));
-        job.setStatus(fields[5]);
-        job.setCreateTime(LocalDateTime.parse(fields[6], FORMATTER));
-        return job;
+        List<String> parts = new ArrayList<>();
+        StringBuilder cur = new StringBuilder();
+        boolean inQuotes = false;
+        for (int i = 0; i < csvLine.length(); i++) {
+            char c = csvLine.charAt(i);
+            if (c == '"') {
+                if (inQuotes && i+1 < csvLine.length() && csvLine.charAt(i+1) == '"') {
+                    cur.append('"');
+                    i++;
+                } else {
+                    inQuotes = !inQuotes;
+                }
+            } else if (c == ',' && !inQuotes) {
+                parts.add(cur.toString());
+                cur.setLength(0);
+            } else {
+                cur.append(c);
+            }
+        }
+        parts.add(cur.toString());
+
+        if (parts.size() < 7) return null; 
+
+        try {
+            Job job = new Job();
+            job.setId(Integer.parseInt(parts.get(0).trim()));
+            job.setTitle(unescapeCsv(parts.get(1).trim()));
+            job.setDescription(unescapeCsv(parts.get(2).trim()));
+            job.setRequiredSkills(unescapeCsv(parts.get(3).trim()));
+            job.setMoId(Integer.parseInt(parts.get(4).trim()));
+            job.setStatus(parts.get(5).trim());
+
+            // 
+            if (parts.get(6) != null && !parts.get(6).trim().isEmpty()) {
+                job.setCreateTime(LocalDateTime.parse(parts.get(6).trim()));
+            } else {
+                job.setCreateTime(LocalDateTime.now());
+            }
+
+            return job;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
+    // 
     public static String getCSVHeader() {
         return "id,title,description,requiredSkills,moId,status,createTime";
     }

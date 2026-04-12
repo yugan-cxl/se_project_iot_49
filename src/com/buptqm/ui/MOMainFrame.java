@@ -205,11 +205,16 @@ public class MOMainFrame extends JFrame {
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         acceptBtn = new JButton("Accept Selected Applicant");
         rejectBtn = new JButton("Reject Selected Applicant");
+        // 关闭职位按钮
+        JButton closeJobBtn = new JButton("Close Selected Job");
+
         acceptBtn.setEnabled(false);
         rejectBtn.setEnabled(false);
+        closeJobBtn.setEnabled(false); // 没选职位时不能点
 
         btnPanel.add(acceptBtn);
         btnPanel.add(rejectBtn);
+        btnPanel.add(closeJobBtn); // 把按钮加进去
         mainPanel.add(btnPanel, BorderLayout.SOUTH);
 
         // 职位列表选择事件：点击职位，加载对应的申请者
@@ -220,8 +225,11 @@ public class MOMainFrame extends JFrame {
                 applicantsListModel.clear();
                 acceptBtn.setEnabled(false);
                 rejectBtn.setEnabled(false);
+                closeJobBtn.setEnabled(false); // 关闭按钮禁用
                 return;
             }
+            // 选中职位后，关闭按钮可用
+            closeJobBtn.setEnabled(true);
             loadApplicants(selectedJob);
         });
 
@@ -242,11 +250,23 @@ public class MOMainFrame extends JFrame {
         rejectBtn.addActionListener(e -> {
             updateApplicationStatus("REJECTED");
         });
+        // 关闭职位按钮逻辑
+        closeJobBtn.addActionListener(e -> {
+            if (selectedJob == null) return;
 
+            // 把职位状态改成 CLOSED
+            selectedJob.setStatus("CLOSED");
+            jobService.updateJob(selectedJob); // 保存到文件
+
+            // 刷新列表
+            loadMyJobs();
+            JOptionPane.showMessageDialog(this, "Job has been closed!", "Success", JOptionPane.INFORMATION_MESSAGE);
+        });
         return mainPanel;
     }
 
     // 弹出TA的CV详情窗口
+    // 弹出TA的CV详情窗口（使用CV对象的独立字段）
     private void showTACV(int taId) {
         User ta = userService.getUserById(taId);
         if (ta == null) {
@@ -255,13 +275,10 @@ public class MOMainFrame extends JFrame {
         }
 
         CV cv = cvService.getCVByTaId(taId);
-        if (cv == null || cv.getContent() == null || cv.getContent().isEmpty()) {
+        if (cv == null) {
             JOptionPane.showMessageDialog(this, "This TA has not created a CV yet!", "Info", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-
-        // 拆分CV内容（和TA端用同一个分隔符！）
-        String[] parts = cv.getContent().split("###", -1);
 
         // 创建CV详情窗口
         JFrame cvFrame = new JFrame("TA CV - " + ta.getRealName());
@@ -287,14 +304,14 @@ public class MOMainFrame extends JFrame {
 
         // 基本信息
         addSectionLabel(contentPanel, gbc, "Basic Information", 0, 0, 2);
-        addInfoRow(contentPanel, gbc, "Name:", parts.length > 0 ? parts[0] : "", 0, 1);
-        addInfoRow(contentPanel, gbc, "Major:", parts.length > 1 ? parts[1] : "", 2, 1);
-        addInfoRow(contentPanel, gbc, "Email:", parts.length > 2 ? parts[2] : "", 0, 2);
-        addInfoRow(contentPanel, gbc, "Tel:", parts.length > 3 ? parts[3] : "", 2, 2);
+        addInfoRow(contentPanel, gbc, "Name:", cv.getName() != null ? cv.getName() : "", 0, 1);
+        addInfoRow(contentPanel, gbc, "Major:", cv.getMajor() != null ? cv.getMajor() : "", 2, 1);
+        addInfoRow(contentPanel, gbc, "Email:", cv.getEmail() != null ? cv.getEmail() : "", 0, 2);
+        addInfoRow(contentPanel, gbc, "Tel:", cv.getTel() != null ? cv.getTel() : "", 2, 2);
 
         // 教育背景
         addSectionLabel(contentPanel, gbc, "Education Background", 0, 3, 2);
-        JTextArea eduArea = createInfoTextArea(parts.length > 4 ? parts[4] : "");
+        JTextArea eduArea = createInfoTextArea(cv.getEducationBackground() != null ? cv.getEducationBackground() : "");
         gbc.gridx = 0; gbc.gridy = 4;
         gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.BOTH;
@@ -303,19 +320,19 @@ public class MOMainFrame extends JFrame {
 
         // 技能特长
         addSectionLabel(contentPanel, gbc, "Skills & Abilities", 0, 5, 2);
-        JTextArea skillArea = createInfoTextArea(parts.length > 5 ? parts[5] : "");
+        JTextArea skillArea = createInfoTextArea(cv.getSkillsAbilities() != null ? cv.getSkillsAbilities() : "");
         gbc.gridx = 0; gbc.gridy = 6;
         contentPanel.add(new JScrollPane(skillArea), gbc);
 
         // 相关经历
         addSectionLabel(contentPanel, gbc, "Relevant Experience", 0, 7, 2);
-        JTextArea expArea = createInfoTextArea(parts.length > 6 ? parts[6] : "");
+        JTextArea expArea = createInfoTextArea(cv.getRelevantExperience() != null ? cv.getRelevantExperience() : "");
         gbc.gridx = 0; gbc.gridy = 8;
         contentPanel.add(new JScrollPane(expArea), gbc);
 
         // 自我评价
         addSectionLabel(contentPanel, gbc, "Self Introduction", 0, 9, 2);
-        JTextArea introArea = createInfoTextArea(parts.length > 7 ? parts[7] : "");
+        JTextArea introArea = createInfoTextArea(cv.getSelfIntroduction() != null ? cv.getSelfIntroduction() : "");
         gbc.gridx = 0; gbc.gridy = 10;
         contentPanel.add(new JScrollPane(introArea), gbc);
 

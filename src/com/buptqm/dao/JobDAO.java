@@ -62,15 +62,19 @@ public class JobDAO {
     // 更新职位信息
     public void updateJob(Job updatedJob) {
         List<String> lines = CSVUtil.readAllLines(FILE_NAME);
-        List<String> newLines = lines.stream()
-                .map(line -> {
-                    Job job = Job.fromCSVString(line);
-                    if (job.getId() == updatedJob.getId()) {
-                        return updatedJob.toCSVString();
-                    }
-                    return line;
-                })
-                .collect(Collectors.toList());
+        List<String> newLines = new ArrayList<>();
+        for (String line : lines) {
+            Job job = Job.fromCSVString(line);
+            if (job == null) {
+                newLines.add(line);
+                continue;
+            }
+            if (job.getId() == updatedJob.getId()) {
+                newLines.add(updatedJob.toCSVString());
+            } else {
+                newLines.add(line);
+            }
+        }
         CSVUtil.writeAllLines(FILE_NAME, newLines, Job.getCSVHeader());
     }
 }

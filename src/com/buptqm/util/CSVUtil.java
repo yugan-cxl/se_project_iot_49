@@ -31,27 +31,34 @@ public class CSVUtil {
 
     // 读取CSV所有行（跳过表头）
     public static List<String> readAllLines(String fileName) {
-        List<String> lines = new ArrayList<>();
-        try {
-            File file = new File(DATA_DIR, fileName);
-            if (!file.exists()) return lines;
+        List<String> records = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(new File(DATA_DIR, fileName)))) {
+            String header = br.readLine(); // 跳过表头，不保存
+            if (header == null) return records;
 
-            BufferedReader br = new BufferedReader(new FileReader(file));
+            StringBuilder currentRecord = new StringBuilder();
+            boolean inQuotes = false;
             String line;
-            boolean first = true;
             while ((line = br.readLine()) != null) {
-                if (first) {
-                    first = false;
-                    continue;
+                if (line.trim().isEmpty() && currentRecord.length() == 0) continue;
+
+                currentRecord.append(line);
+                // 统计当前行中引号数量（简单处理，不考虑转义的双引号）
+                for (char c : line.toCharArray()) {
+                    if (c == '"') inQuotes = !inQuotes;
                 }
-                if (line.trim().isEmpty()) continue;
-                lines.add(line);
+                if (!inQuotes) {
+                    records.add(currentRecord.toString());
+                    currentRecord.setLength(0);
+                } else {
+                    currentRecord.append('\n'); // 保留原换行符
+                }
             }
-            br.close();
+            if (currentRecord.length() > 0) records.add(currentRecord.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return lines;
+        return records;
     }
 
     // 追加写入一行数据
