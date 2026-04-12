@@ -13,7 +13,7 @@ public class AdminMainFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // 🔥 新增：顶部退出按钮面板
+        // 顶部退出按钮面板
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JLabel welcomeLabel = new JLabel("Welcome, " + user.getRealName() + " (Admin)", JLabel.LEFT);
@@ -41,7 +41,7 @@ public class AdminMainFrame extends JFrame {
         add(mainPanel);
     }
 
-    // 🔥 新增：退出登录方法
+    //退出登录方法
     private void logout() {
         this.dispose();
         new LoginFrame().setVisible(true);

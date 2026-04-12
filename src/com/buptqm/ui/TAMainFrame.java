@@ -44,7 +44,7 @@ public class TAMainFrame extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // 🔥 新增：顶部退出按钮面板
+        // 顶部退出按钮面板
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JLabel welcomeLabel = new JLabel("Welcome, " + user.getRealName() + " (TA)", JLabel.LEFT);
@@ -68,7 +68,7 @@ public class TAMainFrame extends JFrame {
         add(mainPanel);
     }
 
-    // 🔥 新增：退出登录方法
+    // 退出登录方法
     private void logout() {
         this.dispose(); // 关闭当前窗口
         new LoginFrame().setVisible(true); // 打开登录窗口
@@ -137,7 +137,7 @@ public class TAMainFrame extends JFrame {
     }
 
     private void showJobDetail(Job job) {
-        // 🔥 新增：通过 moId 查发布人的真实姓名
+        // 通过 moId 查发布人的真实姓名
         String publisherName = "Unknown";
         User publisher = userService.getUserById(job.getMoId());
         if (publisher != null) {
@@ -148,7 +148,7 @@ public class TAMainFrame extends JFrame {
         sb.append("=== Job Detail ===\n\n");
         sb.append("Job ID: ").append(job.getId()).append("\n\n");
         sb.append("Title: ").append(job.getTitle()).append("\n\n");
-        sb.append("Posted by: ").append(publisherName).append("\n\n"); // 🔥 替换原来的 MO ID
+        sb.append("Posted by: ").append(publisherName).append("\n\n"); //替换原来的 MO ID
         sb.append("Description:\n").append(job.getDescription()).append("\n\n");
         sb.append("Required Skills: ").append(job.getRequiredSkills()).append("\n\n");
         sb.append("Posted Time: ").append(job.getCreateTime().toString().replace("T", " "));
@@ -179,9 +179,6 @@ public class TAMainFrame extends JFrame {
         }
     }
 
-    // 🔥 全新专业CV模板界面
-    // 🔥 修复后：4列等宽CV基本信息栏
-    // 🔥 终极修复：真正的4列等宽CV基本信息栏
     private JPanel cvPanel() {
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));

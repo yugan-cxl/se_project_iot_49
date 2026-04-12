@@ -49,7 +49,6 @@ public class Job {
         return value;
     }
 
-    // ====================== 🔥 带时间！完整不崩溃 ======================
     public String toCSVString() {
         return id + "," +
                 escapeCsv(title) + "," +
@@ -57,7 +56,7 @@ public class Job {
                 escapeCsv(requiredSkills) + "," +
                 moId + "," +
                 status + "," +
-                createTime; // 🔥 这里加上时间！
+                createTime; 
     }
 
     public static Job fromCSVString(String csvLine) {
@@ -82,7 +81,7 @@ public class Job {
         }
         parts.add(cur.toString());
 
-        if (parts.size() < 7) return null; // 🔥 现在是7列！
+        if (parts.size() < 7) return null; 
 
         try {
             Job job = new Job();
@@ -93,7 +92,7 @@ public class Job {
             job.setMoId(Integer.parseInt(parts.get(4).trim()));
             job.setStatus(parts.get(5).trim());
 
-            // 🔥 读取时间！不会null！
+            // 
             if (parts.get(6) != null && !parts.get(6).trim().isEmpty()) {
                 job.setCreateTime(LocalDateTime.parse(parts.get(6).trim()));
             } else {
@@ -107,7 +106,7 @@ public class Job {
         }
     }
 
-    // 🔥 表头也加时间！
+    // 
     public static String getCSVHeader() {
         return "id,title,description,requiredSkills,moId,status,createTime";
     }
